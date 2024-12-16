@@ -100,17 +100,21 @@ class GLibServer(object):
     def _object_callback(cls, connection, sender, object_path,
                          interface_name, method_name, parameters,
                          invocation, user_data):
+        invocation_ref = invocation
         # Prepare the user's callback.
         callback, callback_args = user_data
 
-        # Call user's callback.
-        callback(
-            invocation,
-            interface_name,
-            method_name,
-            parameters,
-            *callback_args
-        )
+        try:
+            # Call user's callback.
+            callback(
+                invocation_ref,
+                interface_name,
+                method_name,
+                parameters,
+                *callback_args
+            )
+        finally:
+            invocation_ref = None
 
     @classmethod
     def get_call_info(cls, invocation):
